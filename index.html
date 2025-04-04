@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>AI ToDo List</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400..900&display=swap" rel="stylesheet">
+    </head>
+
+    <body>
+        <div id="app-container">
+            <header>
+                <div id="logo-div">
+                    <img src="media/logo.png" alt="">
+                </div>
+                <div>
+                    <h1>TaskBot</h1>
+                </div>
+            </header>
+            <div id="main-container">
+                <div id="stats-container">
+                    <div>
+                        <h1 id="levelText">Level: 1</h1>
+                        <h2 id="xpText">Xp Points: 0</h2>
+                        <p id="achievementTitle">:</p>
+                        <p id="achievementMessage"></p>
+                    </div>
+                    <div id="badges-container">
+
+                    </div>
+                </div>
+                <div id="list-container">
+                    <div id="toDo-panel">
+                        <ol id="tasksList">
+
+                        </ol>
+                    </div>
+                </div>
+                <div id="chat-container">
+                    <h3>TaskBot</h3>
+                    <div id="chatBox">
+                        <div id="messages-container">
+                            <p class="chatUser">ChatUser</p>
+                            <p class="chatAnswer">ChatAnswer</p>
+                        </div>
+                        <input type="text" name="" id="textInput">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="module" src="script.js"></script>
+
+</html>

@@ -1,0 +1,275 @@
+import { patterns, responses } from './patterns.js';
+
+const textInput = document.getElementById('textInput');
+textInput.focus();
+const messagesContainer = document.getElementById('messages-container');
+const tasksList = document.getElementById('tasksList');
+
+let tasksArray = [];
+let xpPoints = 0;
+let userLevel = 1;
+let completedTasks = 0;
+let deletedTask = 0;
+
+window.onload = function () {
+    let randomNumb = Math.floor(Math.random() * responses.greetingPhrases.length);
+    messagesContainer.innerHTML = `<p class="chatAnswer">${responses.greetingPhrases[randomNumb]}</p>`;
+    tasksArray = JSON.parse(localStorage.getItem('taskList'));
+    xpPoints = JSON.parse(localStorage.getItem('xp'));
+    if (xpPoints == null)
+        xpPoints = 0;
+    userLevel = JSON.parse(localStorage.getItem('level'));
+    if (userLevel == null)
+        userLevel = 0;
+    achievements = JSON.parse(localStorage.getItem('achievements'));
+    if (achievements == null)
+        achievements = {
+            champion: false,
+            master: false,
+            purge: false
+        };
+    completedTasks = JSON.parse(localStorage.getItem('completedTasks'));
+    if (completedTasks == null)
+        completedTasks = 0;
+    deletedTask = JSON.parse(localStorage.getItem('deletedTask'));
+    if (deletedTask == null)
+        deletedTask = 0;
+    document.getElementById('xpText').innerHTML = `Xp points: ${xpPoints}`;
+    document.getElementById('levelText').innerHTML = `Level: ${userLevel}`;
+    if (tasksArray == null || tasksArray == []) {
+        tasksArray = [];
+        xpPoints = 0;
+        userLevel = 1;
+        achievements = {
+            champion: false,
+            master: false,
+            purge: false
+        }
+        deletedTask = 0;
+    }
+    else {
+        for (let task of tasksArray) {
+            Object.setPrototypeOf(task, Task.prototype);
+        }
+        printTasks();
+    }
+    document.getElementById('xpText').innerHTML = `Xp points: ${xpPoints}`;
+    document.getElementById('levelText').innerHTML = `Level: ${userLevel}`;
+}
+
+let achievements = {
+    champion: false,
+    master: false,
+    purge: false
+}
+
+class Task {
+    constructor(task, time) {
+        this.task = task;
+        this.completed = false;
+        this.time = time;
+    }
+}
+
+textInput.addEventListener('keydown', function (e) {
+    if (e.key == 'Enter') {
+        userChatMessage(textInput.value);
+        textInput.value = '';
+        textInput.focus();
+    }
+})
+
+function userChatMessage(message) {
+    messagesContainer.innerHTML += `<p class="chatUser">${message}</p>`;
+    message = message.toLowerCase();
+    let parsedMessage = message.split(' ');
+    switch (true) {
+        case parsedMessage[0] == 'add':
+            let task = parsedMessage.slice(1).join(' ');
+            addTask(task);
+            chatAnswers('add');
+            break;
+        case parsedMessage[0] == 'remove':
+            let indexToDelete = parseInt(parsedMessage.slice(1).join(''));
+            deleteTask(indexToDelete);
+            chatAnswers('remove');
+            break;
+        case parsedMessage[0] == 'complete':
+            let indexToComplete = parseInt(parsedMessage.slice(1).join(''));
+            chatAnswers('complete');
+            completeTask(indexToComplete);
+            break;
+        case parsedMessage[0] == 'help':
+            chatAnswers('help');
+            break;
+        default:
+            chatAnswers(message);
+            break;
+    }
+}
+
+function printTasks() {
+    tasksList.innerHTML = '';
+    for (let task of tasksArray) {
+        if (task.completed == false)
+            tasksList.innerHTML += `<li id="${tasksArray.indexOf(task)}"><span class="openTaskArrow"><img src="media/downArrowIcon.png"></span><span>${tasksArray.indexOf(task) + 1} - ${task.task}</span><span>Added: ${task.time}</span></li>`;
+        else {
+            tasksList.innerHTML += `<li id="${tasksArray.indexOf(task)}" class="taskCompleted">${tasksArray.indexOf(task) + 1} - ${task.task}</li>`;
+        }
+    }
+    document.getElementById('badges-container').innerHTML = '';
+    for (let achivement in achievements) {
+        if (achievements[achivement]) {
+            document.getElementById('badges-container').innerHTML += `<div class="badge">
+                                                                        <img src="media/${achivement}Badge.png" alt="">
+                                                                    </div>`;
+        }
+    }
+}
+
+function addTask(task) {
+    const timestamp = new Date().toLocaleString();
+    let taskObject = new Task(task, timestamp);
+    tasksArray.push(taskObject);
+    localStorage.setItem('taskList', JSON.stringify(tasksArray))
+    printTasks()
+}
+
+function deleteTask(index) {
+    document.getElementById(index - 1).style.animationPlayState = 'running';
+    tasksArray.splice((index - 1), 1);
+    localStorage.setItem('taskList', JSON.stringify(tasksArray))
+    deletedTask++;
+    localStorage.setItem('deletedTask', JSON.stringify(deletedTask))
+    checkTasks();
+    setTimeout(printTasks, 500);
+}
+
+function completeTask(index) {
+    tasksArray[index - 1].completed = true;
+    localStorage.setItem('taskList', JSON.stringify(tasksArray));
+    document.getElementById(index - 1).classList.toggle('running');
+    addXp();
+    completedTasks++;
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+    checkTasks();
+    setTimeout(printTasks, 750);
+}
+
+function chatAnswers(action) {
+    let randomNumb = 0;
+    switch (action) {
+        case 'add':
+            randomNumb = Math.floor(Math.random() * responses.taskConfirmationMessages.length);
+            messagesContainer.innerHTML += `<p class="chatAnswer">${responses.taskConfirmationMessages[randomNumb]}</p>`;
+            break;
+        case 'remove':
+            randomNumb = Math.floor(Math.random() * responses.taskDeletionMessages.length);
+            messagesContainer.innerHTML += `<p class="chatAnswer">${responses.taskDeletionMessages[randomNumb]}</p>`;
+            break;
+        case 'complete':
+            randomNumb = Math.floor(Math.random() * responses.taskCompletionMessages.length);
+            messagesContainer.innerHTML += `<p class="chatAnswer">${responses.taskCompletionMessages[randomNumb]}</p>`;
+            break;
+        case 'help':
+            randomNumb = Math.floor(Math.random() * responses.helpMessages.length);
+            messagesContainer.innerHTML += `<p class="chatAnswer">${responses.helpMessages[randomNumb]}</p>
+                                            <p class="chatAnswer">
+                                                "add [task]": Use this to add a new task to your list." <br><br>
+                                                "remove [task number]": Use this to remove a task from your list." <br><br>
+                                                "complete [task number]": Use this to mark a task as completed." <br><br>
+                                                "help": Shows this help message with all the available commands."
+                                            </p>`;
+            break;
+        default:
+            smallTalk(action);
+            break;
+    }
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function smallTalk(userMessage) {
+    let randomNumb = 0;
+    if (patterns.howAYou.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.howAreYouResponses.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.howAreYouResponses[randomNumb]}</p>`;
+    } else if (patterns.joke.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.techJokes.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.techJokes[randomNumb]}</p>`;
+    } else if (patterns.bored.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.boredResponses.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.boredResponses[randomNumb]}</p>`;
+    } else if (patterns.tired.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.tiredResponses.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.tiredResponses[randomNumb]}</p>`;
+    } else if (patterns.interesting.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.interestingFacts.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.interestingFacts[randomNumb]}</p>`;
+    } else if (patterns.whatCanDo.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.whatCanDo.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.whatCanDo[randomNumb]}</p>`;
+    } else if (patterns.hello.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.hello.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.hello[randomNumb]}</p>`;
+    } else if (patterns.thanks.test(userMessage)) {
+        randomNumb = Math.floor(Math.random() * responses.thanksResponses.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.thanksResponses[randomNumb]}</p>`;
+    } else {
+        randomNumb = Math.floor(Math.random() * responses.unknownCommandMessages.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.unknownCommandMessages[randomNumb]}</p>`;
+    }
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addXp() {
+    xpPoints += 20;
+    let randomNumb = 0;
+    if (xpPoints % 100 == 0) {
+        userLevel++;
+        randomNumb = Math.floor(Math.random() * responses.levelUpPhrases.length);
+        messagesContainer.innerHTML += `<p class="chatAnswer">${responses.levelUpPhrases[randomNumb]}</p>`;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    document.getElementById('xpText').innerHTML = `Xp points: ${xpPoints}`;
+    document.getElementById('levelText').innerHTML = `Level: ${userLevel}`;
+    localStorage.setItem('xp', JSON.stringify(xpPoints));
+    localStorage.setItem('level', JSON.stringify(userLevel));
+}
+
+function checkTasks() {
+    if (completedTasks >= 5) {
+        achievements.champion = true;
+        document.getElementById('achievementTitle').innerHTML = 'Champion Achievement Unlocked:';
+        document.getElementById('achievementMessage').innerHTML = 'Complete 5 tasks';
+        document.getElementById('achievementTitle').classList.add('typing');
+        setTimeout(function () {
+            document.getElementById('achievementMessage').classList.add('typing');
+        }, 2000)
+
+    }
+    if (completedTasks >= 10) {
+        achievements.master = true;
+        document.getElementById('achievementMessage').innerHTML = 'Master Achievement Unlocked: <br>Complete 10 tasks';
+    }
+    if (deletedTask == 3) {
+        achievements.purge = true;
+        document.getElementById('achievementTitle').innerHTML = 'Purge Achievement Unlocked:';
+        document.getElementById('achievementMessage').innerHTML = 'Remove 3 tasks';
+        document.getElementById('achievementTitle').classList.add('typing');
+        setTimeout(function () {
+            document.getElementById('achievementMessage').classList.add('typing');
+        }, 2000)
+    }
+    localStorage.setItem('achievements', JSON.stringify(achievements));
+}
+
+document.body.addEventListener("click", (event) => {
+    if (event.target.parentElement.classList.contains('openTaskArrow')) {
+        event.target.parentElement.parentElement.classList.toggle('open');
+        event.target.classList.toggle('reverse');
+    }
+});
+
+function typeAchievement() {
+
+}

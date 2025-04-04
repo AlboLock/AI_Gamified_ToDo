@@ -1,0 +1,368 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Tektur", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+#app-container {
+  height: 100vh;
+  width: 100%;
+}
+
+header {
+  width: 100%;
+  height: 10%;
+  background: linear-gradient(to top, #272e39, #404a54);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header div:nth-child(2) {
+  flex: 1;
+  text-align: center;
+}
+
+header div:nth-child(2) h1 {
+  color: white;
+  letter-spacing: 0.5rem;
+  font-weight: 700;
+}
+
+header h1 {
+  cursor: default;
+}
+
+#logo-div {
+  height: 100%;
+  padding: 0.5rem;
+  margin-left: 2rem;
+}
+
+#logo-div img {
+  max-height: 100%;
+}
+
+#main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
+}
+
+#stats-container {
+  flex-basis: 25%;
+  min-height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+#levelText {
+  margin-left: 2rem;
+}
+#xpText {
+  margin-left: 2rem;
+}
+
+#list-container {
+  flex-basis: 50%;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#chat-container {
+  flex-basis: 25%;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+#chat-container h3 {
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5rem;
+  font-weight: 500;
+}
+
+#chatBox {
+  width: 100%;
+  border: 1px solid black;
+  padding: 0 1rem;
+  max-height: 75%;
+  border-radius: 10px;
+  box-shadow: 5px 5px 5px black;
+}
+
+#messages-container {
+  width: 100%;
+  max-height: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  margin: 1rem 0;
+}
+
+.chatUser {
+  align-self: flex-end;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: #a8d8ea;
+  max-width: 90%;
+  margin: 0.5rem 0;
+}
+
+.chatAnswer {
+  align-self: flex-start;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: #aa96da;
+  max-width: 90%;
+  margin: 0.5rem 0;
+}
+
+.taskCompleted {
+  text-decoration: line-through;
+}
+
+.taskCompleted::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  border: 1px solid black;
+  border-radius: 50%;
+  width: 1.9rem;
+  height: 1.9rem;
+  left: 100%;
+  transform: translateX(-100%);
+}
+
+.taskCompleted::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 255, 0, 0.5);
+}
+
+#toDo-panel {
+  width: 100%;
+  margin: 0 10rem;
+}
+
+li {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  max-height: 2rem;
+  overflow-y: hidden;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0;
+  text-align: center;
+  background-image: linear-gradient(to bottom, #a8d8ea, #a8d8ea);
+  border-radius: 20px;
+  list-style: none;
+  position: relative;
+  cursor: default;
+  user-select: none;
+  animation-name: removeTask;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-play-state: paused;
+  transition: max-height 0.5s ease-out, background-image 0.5s ease-out,
+    border-radius 0.5s;
+}
+
+@keyframes removeTask {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+li.open {
+  background-image: linear-gradient(to bottom, #a8d8ea, #aa96da);
+  max-height: 4rem;
+  border-radius: 15px;
+}
+
+.openTaskArrow {
+  position: absolute;
+  top: 30%;
+  left: 94%;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.openTaskArrow img {
+  max-width: 100%;
+  transition: transform 0.3s ease-out;
+}
+
+.openTaskArrow img.reverse {
+  transform: rotateZ(180deg);
+}
+
+li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
+  width: 0;
+  height: 100%;
+  background-color: rgba(0, 255, 0, 0.5);
+  animation: completeTaskLi 0.75s ease-in-out forwards;
+  animation-play-state: paused;
+}
+
+li.running::after {
+  animation-play-state: running;
+}
+
+li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid black;
+  border-radius: 50%;
+  width: 1.9rem;
+  height: 1.9rem;
+  animation: completeTaskIcon 0.75s ease-in-out forwards;
+  animation-play-state: paused;
+}
+
+li.running::before {
+  animation-play-state: running;
+}
+
+@keyframes completeTaskIcon {
+  0% {
+  }
+  100% {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes completeTaskLi {
+  0% {
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+#textInput {
+  width: 75%;
+  padding: 0.5rem 1rem;
+  margin: 1.5rem 0;
+  outline: 0;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+#badges-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  flex-basis: 33%;
+}
+
+.badge img {
+  max-width: 100%;
+}
+
+/* #achievementMessage {
+  letter-spacing: 0.25rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+} */
+#achievementTitle.typing {
+  display: inline-block;
+  margin-top: 2rem;
+  overflow: hidden;
+  border-right: 0.15em solid black;
+  white-space: nowrap;
+  letter-spacing: 0.15em;
+  opacity: 0;
+  animation: typing 6s steps(75, end) forwards;
+}
+
+#achievementTitle {
+  margin-left: 2rem;
+  opacity: 0;
+}
+
+#achievementMessage {
+  margin-left: 2rem;
+  opacity: 0;
+}
+
+#achievementMessage.typing {
+  display: inline-block;
+  overflow: hidden;
+  border-right: 0.15em solid black;
+  white-space: nowrap;
+  letter-spacing: 0.15em; /* Adjust as needed */
+  opacity: 0;
+  animation: typing 6s steps(75, end) forwards;
+}
+
+/* The typing effect */
+@keyframes typing {
+  0% {
+    opacity: 1;
+    max-width: 0;
+  }
+  49.99% {
+    border-right: 0.15em solid black;
+  }
+  50% {
+    max-width: 100%;
+    border-right: none;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The typewriter cursor effect
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: black;
+  }
+} */
